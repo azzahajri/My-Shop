@@ -20,9 +20,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
    
+    Route::get('/products/search', [ProductController::class, 'search'])
+    ->name('products.search');
     // Products CRUD
     Route::resource('products', ProductController::class);
-Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 
     // Categories CRUD
     Route::resource('categories', CategoryController::class);

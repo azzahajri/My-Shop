@@ -15,7 +15,7 @@ class ProductController extends Controller
         // eager loading category, pagination
         $products = Product::with('category')
                        ->orderBy('updated_at', 'desc') // <-- produit modifié en premier
-                       ->paginate(10);
+                       ->paginate(5);
 
      return view('products.index', compact('products'));
 
@@ -107,23 +107,22 @@ class ProductController extends Controller
         }
     }
         */
- public function search(Request $request)
-{
-    $query = $request->search;
+    public function search(Request $request)
+    {
+        $query = $request->search;
 
-    $products = Product::with('category')
-        ->when($query, function($q) use ($query) {
-            $q->where('name', 'like', "%$query%")
-              ->orWhereHas('category', function($c) use ($query) {
-                  $c->where('name', 'like', "%$query%");
-              });
-        })
-        ->orderBy('created_at', 'desc')
-        ->get(); // pour live search, on ne paginate pas
+        $products = Product::with('category')
+            ->when($query, function($q) use ($query) {
+                $q->where('name', 'like', "%$query%")
+                ->orWhereHas('category', function($c) use ($query) {
+                    $c->where('name', 'like', "%$query%");
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-    // Retourne un partial blade
-    return view('products.partials.table-body', compact('products'))->render();
-}
+        return view('products.partials.table-body', compact('products'))->render();
+    }
 
 
 

@@ -41,86 +41,12 @@
                 </thead>
 
                 <!-- BODY -->
-                <tbody class="bg-white divide-y divide-gray-100">
-
+                <tbody id="results" class="bg-white divide-y divide-gray-100">
                     @foreach($products as $p)
-                    <tr class="hover:bg-gray-50">
-                        <!-- NAME -->
-                        <td class="px-6 py-4 font-medium text-gray-800">
-                            {{ $p->name }}
-                        </td>
-
-                        <!-- CATEGORY -->
-                        <td class="px-6 py-4">
-                            @if($p->category)
-                                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                                    {{ $p->category->name }}
-                                </span>
-                            @else
-                                <span class="px-3 py-1 bg-gray-200 text-gray-600 rounded-full text-sm">
-                                    Aucune
-                                </span>
-                            @endif
-                        </td>
-
-                        <!-- PRICE -->
-                        <td class="px-6 py-4 text-green-700 font-semibold">
-                            {{ number_format($p->price, 2) }} DT
-                        </td>
-
-                        <!-- STOCK -->
-                        <td class="px-6 py-4">
-                            @if($p->stock > 10)
-                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                                    {{ $p->stock }}
-                                </span>
-                            @elseif($p->stock > 0)
-                                <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">
-                                    {{ $p->stock }}
-                                </span>
-                            @else
-                                <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
-                                    Rupture
-                                </span>
-                            @endif
-                        </td>
-
-                        <!-- DATE -->
-                        <td class="px-6 py-4 text-gray-600 text-sm">
-                            {{ $p->created_at->format('Y-m-d') }}
-                        </td>
-
-                         <td class="px-6 py-4 text-center">
-                            <a href="{{ route('products.show', $p->id) }}"
-                               class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded-lg shadow-md transition duration-200">
-                                Voir
-                            </a>
-                        </td>
-
-                        <!-- EDIT BUTTON (FIXED BLUE) -->
-                        <td class="px-6 py-4 text-center">
-                            <a href="{{ route('products.edit', $p->id) }}"
-                               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-md transition duration-200">
-                                Modifier
-                            </a>
-                        </td>
-
-                        <!-- DELETE BUTTON -->
-                        <td class="px-6 py-4 text-center">
-                            <form action="{{ route('products.destroy', $p->id) }}" method="POST"
-                                  onsubmit="return confirm('Supprimer ce produit ?');">
-                                @csrf
-                                @method('DELETE')
-                                <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg shadow">
-                                    Supprimer
-                                </button>
-                            </form>
-                        </td>
-
-                    </tr>
+                        @include('products.partials.single-row', ['p' => $p])
                     @endforeach
-
                 </tbody>
+
             </table>
         </div>
 
@@ -129,6 +55,32 @@
             {{ $products->links() }}
         </div>
 
-    </div>
+        </div>
 </div>
 @endsection
+
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+$(document).ready(function() {
+
+    $('#product-search').on('keyup', function() {
+        let query = $(this).val();
+
+        $.ajax({
+            url: "{{ route('products.search') }}",
+            type: "GET",
+            data: { search: query },
+            success: function(data) {
+                $('#results').html(data);
+            },
+            error: function(xhr) {
+                console.log("AJAX ERROR:", xhr.responseText);
+            }
+        });
+    });
+
+});
+</script>
