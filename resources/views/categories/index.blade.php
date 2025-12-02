@@ -12,6 +12,13 @@
                 </a>
 
             </div>
+            <!-- SEARCH (no button) -->
+        <div class="mb-4">
+            <input id="category-search" type="text" name="search" value="{{ request('search') }}"
+                   placeholder="Tapez pour rechercher..."
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                   
+        </div>
               <!-- TABLE -->
         <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
             <table class="min-w-full border border-gray-300 rounded-lg overflow-hidden">
@@ -23,31 +30,10 @@
                     </tr>
                 </thead>
 
-                <tbody class="bg-white divide-y divide-gray-100">
-                @foreach($categories as $c)
-                    <tr>
-                        <td class="px-6 py-4 text-gray-600 text-sm">{{ $c->name }}</td>
-                        <td class="px-6 py-4 text-gray-600 text-sm">{{ $c->slug }}</td>
-
-                        <td class="px-6 py-4 text-center">
-                            <a href="{{ route('categories.edit', $c->id) }}"
-                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg shadow">
-                                Modifier
-                            </a>
-                        </td>
-
-                        <td class="px-6 py-4 text-center">
-                            <form action="{{ route('categories.destroy', $c->id) }}" method="POST"
-                                onsubmit="return confirm('Supprimer cette catégorie ?');">
-                                @csrf
-                                @method('DELETE')
-                                <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg shadow">
-                                    Supprimer
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
+                <tbody id="results" class="bg-white divide-y divide-gray-100">
+                    @foreach($categories as $c)
+                        @include('categories.partials.single-row', ['c' => $c])
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -58,3 +44,31 @@
     </div>
 </div>
 @endsection
+
+
+
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+$(document).ready(function() {
+
+    $('#category-search').on('keyup', function() {
+        let query = $(this).val();
+
+        $.ajax({
+            url: "{{ route('categories.search') }}",
+            type: "GET",
+            data: { search: query },
+            success: function(data) {
+                $('#results').html(data);
+            },
+            error: function(xhr) {
+                console.log("AJAX ERROR:", xhr.responseText);
+            }
+        });
+    });
+
+});
+</script>

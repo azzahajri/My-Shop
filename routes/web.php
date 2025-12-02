@@ -25,6 +25,8 @@ Route::middleware('auth')->group(function () {
     // Products CRUD
     Route::resource('products', ProductController::class);
 
+    Route::get('/categories/search', [CategoryController::class, 'search'])
+    ->name('categories.search');
     // Categories CRUD
     Route::resource('categories', CategoryController::class);
 });

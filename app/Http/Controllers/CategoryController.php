@@ -80,4 +80,20 @@ class CategoryController extends Controller
         $category->delete();
         return redirect()->route('categories.index')->with('success', 'Category supprimé avec succès.');
     }
+
+     public function search(Request $request)
+{
+    $query = $request->search;
+
+    $categories = Category::when($query, function ($q) use ($query) {
+            $q->where('name', 'like', "%{$query}%")
+              ->orWhere('slug', 'like', "%{$query}%");
+        })
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('categories.partials.table-body', compact('categories'))->render();
+}
+
+
 }
